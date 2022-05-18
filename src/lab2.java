@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,13 +11,13 @@ import java.util.Random;
 //T = 1-25
 public class lab2 {
     public static void main(String[] args) {
-        int m = 10;
+        int m = 4;
         Random rand = new Random();
-        int n = rand.nextInt((15-6)+1)+6;
+        int n = rand.nextInt((3-2)+2)+2;
         int[][] workload = new int[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                workload[i][j] = rand.nextInt((25-1)+1)+1;
+                workload[i][j] = rand.nextInt((3-2)+2)+2;
             }
         }
         System.out.println("Матрица рабочих процессов");
@@ -41,12 +42,10 @@ public class lab2 {
             for (int j = 0; j < timeless_row.length; j++) {
                 if (sumRow[i]==timeless_row[j]){
                     rIndex = j;
-                    break;
                 }
             }
             I.add(rIndex);
         }
-
         System.out.println("Индексы в зависимости от уравнения " + I);
 
         List<int[]>wokload_sorted = new ArrayList<>();
@@ -65,7 +64,7 @@ public class lab2 {
             int min_in_row = min(wokload_sorted.get(i));
             for (int j = 0; j < m; j++) {
                 if (wokload_sorted.get(i)[j]==min_in_row){
-                    process_table[i][j] = wokload_sorted.get(i)[j];
+                    process_table[i] = wokload_sorted.get(i);
                 }
             }
         }
@@ -74,8 +73,13 @@ public class lab2 {
         for (int i = 0; i < process_table.length; i++) {
             System.out.println(Arrays.toString(process_table[i]));
         }
-
-        
+        System.out.println("Решение");
+        int[] vector = new int[process_table.length];
+        for (int i = 0; i < process_table.length; i++) {
+            vector[i] = process_table[i][i];
+        }
+        vector = sort(vector);
+        System.out.println("Max"+ Arrays.toString(vector)+" = "+ vector[0]);
 
     }
 
