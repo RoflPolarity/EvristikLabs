@@ -17,7 +17,7 @@ import java.util.List;
             for (int i = 0; i < tasks.length; i++) {
                 tasks[i] = (int) (Math.random() * ((40 - 35) + 1) + 35);
             }
-            tasks = sort(tasks);
+            sort(tasks);
             System.out.println(Arrays.toString(tasks));
             int j = 0;
             for (int i = 0; i < tasks.length; i++) {

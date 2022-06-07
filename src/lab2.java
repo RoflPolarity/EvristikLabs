@@ -4,11 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-//Вариант 12
-//Алгоритм 3 2
-//n = 10
-//m = 6-15
-//T = 1-25
 public class lab2 {
     public static void main(String[] args) {
         int m = 4;
