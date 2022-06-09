@@ -104,11 +104,12 @@ public static void initValue(){
         List<Individual> pair_crossing = new ArrayList<>();
         while (pair_crossing.size() != 2) {
             for (Individual i : individuals_array){
+                if (pair_crossing.size()==2) break;
                 if (make_probability(pk)){
-                    if ((pair_crossing.size() == 1) && (pair_crossing.get(0).equals(i))){
+                    if ((pair_crossing.size() == 1) && (pair_crossing.get(0)==i)){
                         continue;
                     }
-                        pair_crossing.add(i);
+                    pair_crossing.add(i);
                 }
             }
         }
@@ -119,30 +120,30 @@ public static void initValue(){
         return pair_crossing;
 }
     public static void mutation(List<Individual> pair_result){
+        Random rand = new Random();
         System.out.println("---------------------------");
         System.out.println("Мутация");
         for (Individual individual : pair_result) {
             System.out.println("---------------------------");
             if (make_probability(pm)) {
-                int mutation_point = (int) (Math.random() * (individuals_array.size() - 1) - 1);
+                int mutation_point = rand.nextInt(individuals_array.size());
                 System.out.println("Индекс мутированного элемента " + mutation_point);
-                int mutation_index = (int) ((Math.random() * 6) - 1);
+                int mutation_index = (int) ((Math.random() * 8) + 1);
                 System.out.println("Разряд, для инверсии(с 0): " + mutation_index);
-                String mutation_element = Integer.toBinaryString(individual.value.get(mutation_point));
+                StringBuilder mutation_element = new StringBuilder(Integer.toBinaryString(individual.value.get(mutation_point)));
                 while (mutation_element.length() != 8) {
-                    mutation_element = "0" + mutation_element;
+                    mutation_element.insert(0, "0");
                     System.out.println("Элемент в двоичной системе исчисления: " + mutation_element);
-                    String mutation_element_result = "";
+                    StringBuilder mutation_element_result = new StringBuilder();
                     for (int q = 0; q < mutation_element.length(); q++) {
                         if ((q == mutation_index) && (mutation_element.charAt(q) == '0')) {
-                            mutation_element_result = mutation_element_result + "1";
+                            mutation_element_result.append("1");
                         } else if ((q == mutation_index) && (mutation_element.charAt(q) == '1')) {
-                            mutation_element_result = mutation_element_result + "0";
-                        } else mutation_element_result = mutation_element_result + mutation_element.charAt(q);
+                            mutation_element_result.append("0");
+                        } else mutation_element_result.append(mutation_element.charAt(q));
                     }
                     System.out.println("Элемент после мутации:" + mutation_element_result);
-                    mutation_element = String.valueOf(Integer.parseInt(mutation_element_result, 2));
-                    individual.value.set(mutation_point,Integer.parseInt(mutation_element));
+                    individual.value.set(mutation_point,Integer.parseInt(mutation_element_result.toString(), 2));
                 }
             }
         }
@@ -175,8 +176,9 @@ public static void initValue(){
                 for(Individual t : best_individuals_in_generation) {
                     phenotypes.add(t.phenotype);
                 }
+                Counter counter = new Counter(phenotypes);
                 int index_dop = phenotypes.get(phenotypes.size()-1);
-                if (phenotypes.get(index_dop) == kpovtor) break;
+                if (counter.getCount(index_dop) == kpovtor) break;
             }
                 for(Individual i : individuals_array) {
                     List<Individual> pair_result = new ArrayList<>();
@@ -208,6 +210,19 @@ public static void initValue(){
             for(Individual y : best_individuals_in_generation) {
                 y.print();
             }
+        }
+}
+static class Counter{
+        List<Integer> data;
+        public Counter(List<Integer> data){
+            this.data = data;
+        }
+        public int getCount(int key){
+            int counter = 0;
+            for (int i = 0; i < data.size(); i++) {
+                if (data.get(i)==key) counter++;
+            }
+            return counter;
         }
 }
 
