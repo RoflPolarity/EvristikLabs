@@ -34,8 +34,9 @@ public static void initValue(){
         individual_value = scanner.nextInt();
         array_start = new int[m];
         for (int i = 0; i < array_start.length; i++) {
-            array_start[i] =(int) (Math.random()*((b-a)-1)-a);
+            array_start[i] = (int) (Math.random()*((b-a)+1)+a);
         }
+        System.out.println(Arrays.toString(array_start));
         intervals_array = make_interval_array(n);
         individuals_array = make_first_generation(m,individual_value);
         phenotype = make_phenotype(individuals_array,intervals_array,array_start);
@@ -47,10 +48,10 @@ public static void initValue(){
             int interval = 255 / n;
             while(intervals_array.size()<=n-1){
                 intervals_array.add(interval_value);
+                interval_value += interval;
             }
-            interval_value = interval_value+interval;
             intervals_array.add(interval_value+(255%n));
-            System.out.println((intervals_array));
+            System.out.println(intervals_array);
             return intervals_array;
 }
         public static List<Individual> make_first_generation(int m,int individual_value){
@@ -58,10 +59,9 @@ public static void initValue(){
             for (int i = 0; i<individual_value; i++) {
                 ArrayList<Integer> temp = new ArrayList<>();
                 for (int j = 0; j < m; j++) {
-                    temp.add((int) (Math.random() * (254)));
+                    temp.add((int) (Math.random() * (255)+1));
                 }
                 individuals_array.add(new Individual(temp));
-                temp.clear();
             }
             System.out.println("Первое поколение:");
             for (Individual q :individuals_array){
