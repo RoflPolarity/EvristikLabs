@@ -1,18 +1,45 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import static jdk.nashorn.internal.objects.Global.print;
+import java.util.*;
 
 public class lab6 {
-public static void main(String[] args) {
-    int[] tasks = new int[(int) (Math.random()*(25-20)+20)];
-    for (int i = 0; i < tasks.length; i++) {
-        tasks[i] = (int) (Math.random()*(35-20)+20);
-    }
+    static int m,n,a,b,kpovtor,individual_value;
+    static double pk,pm;
+    static int[] array_start;
+    static List<Integer> intervals_array;
+    static List<Individual> individuals_array;
+    static List<Individual> phenotype;
 
+    public static void main(String[] args) {
+    initValue();
+    reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
 }
+
+
+public static void initValue(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите число заданий m");
+        m = scanner.nextInt();
+        System.out.println("Введите число процессоров n");
+        n = scanner.nextInt();
+        System.out.println("Введите начало диапазона для заданий");
+        a = scanner.nextInt();
+        System.out.println("Введите конец диапазона для заданий");
+        b = scanner.nextInt();
+        System.out.println("Введите вероятность кроссовера");
+        pk = scanner.nextDouble();
+        System.out.println("Введите вероятность мутации");
+        pm = scanner.nextDouble();
+        System.out.println("Введите количество раз, когда лучшая особь повторяется в поколении");
+        kpovtor = scanner.nextInt();
+        System.out.println("Введите количество особей в начальном поколении");
+        individual_value = scanner.nextInt();
+        array_start = new int[m];
+        for (int i = 0; i < array_start.length; i++) {
+            array_start[i] =(int) (Math.random()*((b-a)-1)-a);
+        }
+        intervals_array = make_interval_array(n);
+        individuals_array = make_first_generation(m,individual_value);
+        phenotype = make_phenotype(individuals_array,intervals_array,array_start);
+    }
 
         public static List<Integer> make_interval_array(int n){
             List<Integer> intervals_array = new ArrayList<>();
@@ -21,7 +48,6 @@ public static void main(String[] args) {
             while(intervals_array.size()<=n-1){
                 intervals_array.add(interval_value);
             }
-
             interval_value = interval_value+interval;
             intervals_array.add(interval_value+(255%n));
             System.out.println((intervals_array));
@@ -96,36 +122,33 @@ public static void main(String[] args) {
         System.out.println("---------------------------");
         System.out.println("Мутация");
         for (Individual individual : pair_result) {
-            print("---------------------------");
-            if (!make_probability(pm)) {
+            System.out.println("---------------------------");
+            if (make_probability(pm)) {
+                int mutation_point = (int) (Math.random() * (individuals_array.size() - 1) - 1);
+                System.out.println("Индекс мутированного элемента " + mutation_point);
+                int mutation_index = (int) ((Math.random() * 6) - 1);
+                System.out.println("Разряд, для инверсии(с 0): " + mutation_index);
+                String mutation_element = Integer.toBinaryString(individual.value.get(mutation_point));
+                while (mutation_element.length() != 8) {
+                    mutation_element = "0" + mutation_element;
+                    System.out.println("Элемент в двоичной системе исчисления: " + mutation_element);
+                    String mutation_element_result = "";
+                    for (int q = 0; q < mutation_element.length(); q++) {
+                        if ((q == mutation_index) && (mutation_element.charAt(q) == '0')) {
+                            mutation_element_result = mutation_element_result + "1";
+                        } else if ((q == mutation_index) && (mutation_element.charAt(q) == '1')) {
+                            mutation_element_result = mutation_element_result + "0";
+                        } else mutation_element_result = mutation_element_result + mutation_element.charAt(q);
+                    }
+                    System.out.println("Элемент после мутации:" + mutation_element_result);
+                    mutation_element = String.valueOf(Integer.parseInt(mutation_element_result, 2));
+                    individual.value.set(mutation_point,Integer.parseInt(mutation_element));
+                }
             }
-            else{
-                int mutation_point = Math.random()*individuals_array - 1);
-                print("Индекс мутированного элемента", mutation_point);
-                mutation_index = random.randint(0, 7)
-                print("Разряд, для инверсии(с 0):", mutation_index)
-                mutation_element = bin(individual.value[mutation_point]).replace("0b", "")
-                while (len(mutation_element) != 8):
-                mutation_element = "0" + mutation_element
-                print("Элемент в двоичной системе исчисления:", mutation_element)
-                mutation_element_result = ""
-                for q in range(0, len(mutation_element)):
-                if ((q == mutation_index) and(mutation_element[q] == "0")):
-                mutation_element_result = mutation_element_result + "1"
-                continue elif ((q == mutation_index) and(mutation_element[q] == "1")):
-                mutation_element_result = mutation_element_result + "0"
-                continue
-            else:
-                mutation_element_result = mutation_element_result + mutation_element[q]
-                print("Элемент после мутации:", mutation_element_result)
-                mutation_element = int(mutation_element_result, base = 2)
-                (individual.value)[mutation_point] = mutation_element
-            }
-            }
-            print("Пара после мутации:")
-            for q in pair_result:
-            q.print()
-            return pair_result
+        }
+            System.out.println("Пара после мутации: ");
+            for(Individual q : pair_result) q.print();
+            return pair_result;
         }
 
     def tourney(individuals_array,best_new_individuals):
@@ -193,6 +216,7 @@ public static void main(String[] args) {
         }
     }
 }
+
 class Individual{
     List<Integer> value;
     int phenotype = -1;
