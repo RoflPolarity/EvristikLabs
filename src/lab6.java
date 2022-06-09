@@ -44,7 +44,7 @@ public static void initValue(){
         public static List<Integer> make_interval_array(int n){
             List<Integer> intervals_array = new ArrayList<>();
             int interval_value = 0;
-            int interval = Math.round(255 / n);
+            int interval = 255 / n;
             while(intervals_array.size()<=n-1){
                 intervals_array.add(interval_value);
             }
@@ -72,20 +72,20 @@ public static void initValue(){
 }
     public static List<Individual> make_phenotype(List<Individual> individuals_array,List<Integer>intervals_array,int []array){
         System.out.println("Подсчёт фенотипов:");
-        for (int x = 0; x < individuals_array.size(); x++) {
+        for (Individual individual : individuals_array) {
             int[] interval_division = new int[intervals_array.size()];
-            for (int i = 0; i < intervals_array.size()-1; i++) {
+            for (int i = 0; i < intervals_array.size() - 1; i++) {
                 interval_division[i] = 0;
             }
-            for (int y = 0; y<individuals_array.get(x).value.size(); y++){
+            for (int y = 0; y < individual.value.size(); y++) {
                 int t = 0;
-                while (intervals_array.get(t) < individuals_array.get(x).value.get(y)) {
-                t = t + 1;
-            }
+                while (intervals_array.get(t) < individual.value.get(y)) {
+                    t = t + 1;
+                }
                 interval_division[t - 1] = interval_division[t - 1] + array[y];
             }
-        Arrays.sort(interval_division);
-        individuals_array.get(x).phenotype = interval_division[interval_division.length-1];
+            Arrays.sort(interval_division);
+            individual.phenotype = interval_division[interval_division.length - 1];
         }
         for (Individual i : individuals_array) {
             i.print();
@@ -118,7 +118,7 @@ public static void initValue(){
         }
         return pair_crossing;
 }
-    public static List<Individual>  mutation(List<Individual> pair_result){
+    public static void mutation(List<Individual> pair_result){
         System.out.println("---------------------------");
         System.out.println("Мутация");
         for (Individual individual : pair_result) {
@@ -148,82 +148,77 @@ public static void initValue(){
         }
             System.out.println("Пара после мутации: ");
             for(Individual q : pair_result) q.print();
-            return pair_result;
-        }
-
-    def tourney(individuals_array,best_new_individuals):
-    print("---------------------------")
-    print("Турнир")
-    print("---------------------------")
-    print("Исходное поколение:")
-    for i in individuals_array:
-            i.print()
-    print("---------------------------")
-    print("Новые особи:")
-    for j in best_new_individuals:
-            j.print()
-            for x in range(0,len(individuals_array)):
-            if (individuals_array[x].phenotype>best_new_individuals[x].phenotype):
-    individuals_array[x]=best_new_individuals[x]
-    print("Результат турнира(новое поколение):")
-    for q in individuals_array:
-            q.print()
-    print("---------------------------")
-    return  individuals_array
-
-    def reproduction(individuals_array,pk,pm,intervals_array,kpovtor):
-    best_individuals_in_generation = []
-
-
-            while(True):
-    best_new_individuals = []
-            if (len(best_individuals_in_generation)>=kpovtor):
-    phenotypes =[]
-            for t in best_individuals_in_generation:
-            phenotypes.append(t.phenotype)
-    counter = Counter(phenotypes)
-    index_dop = phenotypes[-1]
-            if (counter[index_dop]==kpovtor):
-            break
-            for i in individuals_array:
-    pair_result = []
-    pair_crossing = make_pair_crossing(individuals_array,pk)
-    split_point = random.randint(1,len(individuals_array)-1)
-    print("Точка разбиения:",split_point)
-    p1 = Individual(pair_crossing[0].value[:split_point]+pair_crossing[1].value[split_point:])
-    p2 = Individual(pair_crossing[1].value[:split_point]+pair_crossing[0].value[split_point:])
-    print(p1.value)
-    print(p2.value)
-            pair_result.append(p1)
-            pair_result.append(p2)
-    pair_result = make_phenotype(pair_result, intervals_array, array_start)
-    pair_result = mutation(pair_result)
-    pair_result = make_phenotype(pair_result,intervals_array,array_start)
-            if (pair_result[0].phenotype>pair_result[1].phenotype):
-            best_new_individuals.append(pair_result[1])
-            else:
-            best_new_individuals.append(pair_result[0])
-    individuals_array = tourney(individuals_array,best_new_individuals)
-    best_individual = individuals_array[0]
-            for individual in individuals_array:
-            if individual.phenotype<best_individual.phenotype:
-    best_individual = individual
-        best_individuals_in_generation.append(best_individual)
-    print("Лучшие особи в поколениях:")
-    for y in best_individuals_in_generation:
-            y.print()
-
-        }
     }
+
+    public static void tourney(List<Individual> individuals_array, List<Individual> best_new_individuals) {
+        System.out.println("---------------------------" + "\n Турнир" + "\n---------------------------" + "\nИсходное поколение:");
+        individuals_array.forEach(Individual::print);
+        System.out.println("---------------------------" + "\nНовые особи:");
+        best_new_individuals.forEach(Individual::print);
+        for(int x = 0; x<individuals_array.size();x++) {
+            if (individuals_array.get(x).phenotype > best_new_individuals.get(x).phenotype) {
+                individuals_array.set(x,best_new_individuals.get(x));
+            }
+        }
+        System.out.println("Результат турнира(новое поколение):");
+        individuals_array.forEach(Individual::print);
+        System.out.println("---------------------------");
+    }
+
+
+    public static void reproduction(List<Individual> individuals_array,double pk,double pm,List<Integer> intervals_array,int kpovtor){
+    List<Individual> best_individuals_in_generation = new ArrayList<>();
+        while(true) {
+           List<Individual> best_new_individuals = new ArrayList<>();
+            if (best_individuals_in_generation.size() >= kpovtor) {
+                List<Integer> phenotypes = new ArrayList<>();
+                for(Individual t : best_individuals_in_generation) {
+                    phenotypes.add(t.phenotype);
+                }
+                int index_dop = phenotypes.get(phenotypes.size()-1);
+                if (phenotypes.get(index_dop) == kpovtor) break;
+            }
+                for(Individual i : individuals_array) {
+                    List<Individual> pair_result = new ArrayList<>();
+                    List<Individual> pair_crossing = make_pair_crossing(individuals_array, pk);
+                    int split_point = (int) (Math.random()*((individuals_array.size()-1))-1);
+                    System.out.println("Точка разбиения: " +  split_point);
+                    List<Integer> p1 = new ArrayList<>();
+                    for (int j = 0; j < split_point; j++) p1.add(pair_crossing.get(0).value.get(j));
+                    for (int j = split_point; j < pair_crossing.get(0).value.size(); j++) p1.add(pair_crossing.get(1).value.get(j));
+                    List<Integer> p2 = new ArrayList<>();
+                    for (int j = 0; j < split_point; j++) p2.add(pair_crossing.get(1).value.get(j));
+                    for (int j = split_point; j < pair_crossing.get(0).value.size(); j++) p2.add(pair_crossing.get(0).value.get(j));
+                    System.out.println(p1);
+                    System.out.println(p2);
+                    pair_result.add(new Individual(p1));
+                    pair_result.add(new Individual(p2));
+                    make_phenotype(pair_result, intervals_array, array_start);
+                    mutation(pair_result);
+                    make_phenotype(pair_result, intervals_array, array_start);
+                    if (pair_result.get(0).phenotype > pair_result.get(1).phenotype)best_new_individuals.add(pair_result.get(1));
+                    else best_new_individuals.add(pair_result.get(0));
+                }
+            tourney(individuals_array, best_new_individuals);
+            Individual best_individual = individuals_array.get(0);
+            for (Individual individual : individuals_array)
+            if (individual.phenotype<best_individual.phenotype) best_individual = individual;
+            best_individuals_in_generation.add(best_individual);
+            System.out.println("Лучшие особи в поколениях:");
+            for(Individual y : best_individuals_in_generation) {
+                y.print();
+            }
+        }
 }
 
-class Individual{
+static class Individual{
     List<Integer> value;
     int phenotype = -1;
-    public Individual(ArrayList<Integer> value){
+    public Individual(List<Integer> value){
         this.value = value;
     }
     public void print(){
         System.out.println(this.value +" "+this.phenotype);
+        }
     }
 }
