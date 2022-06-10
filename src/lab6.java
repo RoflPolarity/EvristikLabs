@@ -13,7 +13,6 @@ public class lab6 {
     reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
 }
 
-
 public static void initValue(){
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите число заданий m");
@@ -212,6 +211,7 @@ public static void initValue(){
             }
         }
 }
+
 static class Counter{
         List<Integer> data;
         public Counter(List<Integer> data){
@@ -225,7 +225,6 @@ static class Counter{
             return counter;
         }
 }
-
 static class Individual{
     List<Integer> value;
     int phenotype = -1;
