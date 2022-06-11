@@ -31,13 +31,18 @@ public class lab7 {
         kpovtor = scanner.nextInt();
         System.out.println("Введите количество особей в начальном поколении");
         individual_value = scanner.nextInt();
-        array_start = new int[n][m];
+        array_start = new int[m][n];
         for (int i = 0; i < array_start.length; i++) {
             for (int j = 0; j < array_start[i].length; j++) {
                 array_start[i][j] = (int) (Math.random()*((b-a)+1)+a);
             }
         }
-        System.out.println(Arrays.deepToString(array_start));
+        for (int i = 0; i <array_start.length ; i++) {
+            for (int j = 0; j <array_start[i].length ; j++) {
+                System.out.print(array_start[i][j] +" ");
+            }
+            System.out.println();
+        }
         System.out.println("Границы интервалов");
         intervals_array = make_interval_array(n);
         individuals_array = make_first_generation(m,individual_value, intervals_array,array_start);
@@ -200,6 +205,7 @@ public class lab7 {
 
     public static void reproduction(List<Individual> individuals_array,double pk,double pm,List<Integer> intervals_array,int kpovtor){
         List<Individual> best_individuals_in_generation = new ArrayList<>();
+        Random random = new Random();
         while(true) {
             List<Individual> best_new_individuals = new ArrayList<>();
             List<Integer> p1 = new ArrayList<>();
@@ -216,19 +222,19 @@ public class lab7 {
             for(Individual i : individuals_array) {
                 List<Individual> pair_result = new ArrayList<>();
                 List<Individual> pair_crossing = make_pair_crossing(individuals_array, pk);
-                int split_point = (int) (Math.random()*((individuals_array.size()-1))-1);
-                int split_point2 = (int) (Math.random()*((individuals_array.size()-1))-1);
+                int split_point = random.nextInt((individuals_array.size()-1)+1)+1;
+                int split_point2 = random.nextInt((individuals_array.size()-1)+1)+1;
                 while (split_point==split_point2) split_point2 = (int) (Math.random()*((individuals_array.size()-1))-1);
                 System.out.println("Точка разбиения №1: " +  split_point);
                 System.out.println("Точка разбиения №2: " +  split_point2);
                 if (split_point<split_point2){
                     for (int j = 0; j < split_point; j++) p1.add(pair_crossing.get(0).value.get(j));
                     for (int j = split_point; j < split_point2; j++) p1.add(pair_crossing.get(1).value.get(j));
-                    for (int j = split_point2; j < pair_crossing.get(1).value.size(); j++) p1.add(pair_crossing.get(1).value.get(j));
+                    for (int j = split_point2; j < pair_crossing.get(0).value.size(); j++) p1.add(pair_crossing.get(0).value.get(j));
 
                     for (int j = 0; j < split_point; j++) p2.add(pair_crossing.get(1).value.get(j));
                     for (int j = split_point; j <split_point2 ; j++) p2.add(pair_crossing.get(0).value.get(j));
-                    for (int j = split_point2; j < pair_crossing.get(0).value.size(); j++) p2.add(pair_crossing.get(0).value.get(j));
+                    for (int j = split_point2; j < pair_crossing.get(1).value.size(); j++) p2.add(pair_crossing.get(1).value.get(j));
                 }else {
                     for (int j = 0; j < split_point2; j++) p1.add(pair_crossing.get(0).value.get(j));
                     for (int j = split_point2; j < split_point; j++) p1.add(pair_crossing.get(1).value.get(j));

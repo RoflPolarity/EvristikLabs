@@ -1,7 +1,8 @@
 import java.util.*;
 
 public class lab6 {
-    static int m,n,a,b,kpovtor,individual_value;
+    Individual best_crossover;
+    static int m,n,a,b,kpovtor,individual_value, counterPok;
     static double pk,pm;
     static int[] array_start;
     static List<Integer> intervals_array;
@@ -73,15 +74,15 @@ public static void initValue(){
         System.out.println("Подсчёт фенотипов:");
         for (Individual individual : individuals_array) {
             int[] interval_division = new int[intervals_array.size()];
-            for (int i = 0; i < intervals_array.size() - 1; i++) {
-                interval_division[i] = 0;
-            }
+            for (int i = 0; i < intervals_array.size() - 1; i++) interval_division[i] = 0;
             for (int y = 0; y < individual.value.size(); y++) {
                 int t = 0;
                 while (intervals_array.get(t) < individual.value.get(y)) {
                     t = t + 1;
                 }
-                interval_division[t - 1] = interval_division[t - 1] + array[y];
+
+                interval_division[t - 1] += array[y];
+                individual.tasks.add(array[y]);
             }
             Arrays.sort(interval_division);
             individual.phenotype = interval_division[interval_division.length - 1];
@@ -116,6 +117,7 @@ public static void initValue(){
         for (Individual w : pair_crossing) {
             w.print();
         }
+
         return pair_crossing;
 }
     public static void mutation(List<Individual> pair_result){
@@ -148,6 +150,7 @@ public static void initValue(){
         }
             System.out.println("Пара после мутации: ");
             for(Individual q : pair_result) q.print();
+
     }
 
     public static void tourney(List<Individual> individuals_array, List<Individual> best_new_individuals) {
@@ -160,7 +163,8 @@ public static void initValue(){
                 individuals_array.set(x,best_new_individuals.get(x));
             }
         }
-        System.out.println("Результат турнира(новое поколение):");
+        counterPok++;
+        System.out.println("Результат турнира(Поколение " + counterPok+ "):");
         individuals_array.forEach(Individual::print);
         System.out.println("---------------------------");
     }
@@ -195,6 +199,7 @@ public static void initValue(){
                     pair_result.add(new Individual(p1));
                     pair_result.add(new Individual(p2));
                     make_phenotype(pair_result, intervals_array, array_start);
+                    List<Individual> pairRes = new ArrayList<>();
                     mutation(pair_result);
                     make_phenotype(pair_result, intervals_array, array_start);
                     if (pair_result.get(0).phenotype > pair_result.get(1).phenotype)best_new_individuals.add(pair_result.get(1));
@@ -226,13 +231,16 @@ static class Counter{
         }
 }
 static class Individual{
+        List<Integer> tasks;
     List<Integer> value;
     int phenotype = -1;
     public Individual(List<Integer> value){
         this.value = value;
+        this.tasks = new ArrayList<>();
     }
-    public void print(){
-        System.out.println(this.value +" "+this.phenotype);
-        }
+    public void print() {
+        System.out.println(this.value + " " + this.phenotype);
+        System.out.println(tasks);
+    }
     }
 }
