@@ -261,15 +261,15 @@ static class Counter{
 }
 static class Individual{
         List<Integer> tasks;
-    List<Integer> value;
-    int phenotype = -1;
-    public Individual(List<Integer> value){
-        this.value = value;
-        this.tasks = new ArrayList<>();
-    }
-    public void print() {
-        System.out.println(this.value + " " + this.phenotype);
-        System.out.println(tasks);
-    }
+        List<Integer> value;
+        int phenotype = -1;
+        public Individual(List<Integer> value){
+            this.value = value;
+            this.tasks = new ArrayList<>();
+        }
+        public void print() {
+            System.out.println(this.value + " " + this.phenotype);
+            System.out.println(tasks);
+        }
     }
 }

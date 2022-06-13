@@ -1,16 +1,32 @@
 import java.util.*;
 
 public class lab7 {
-    static int m,n,a,b,kpovtor,individual_value;
+    static List<Individual> best_crossover, phenotype, individuals_array, IndividualOfMutation;
+    static int m,n,a,b,kpovtor,individual_value,counterPok;
     static double pk,pm;
     static int[][] array_start;
     static List<Integer> intervals_array;
-    static List<Individual> individuals_array;
-    static List<Individual> phenotype;
 
     public static void main(String[] args) {
         initValue();
-        reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
+        best_crossover = new ArrayList<>();
+        IndividualOfMutation = new ArrayList<>();
+        while (best_crossover.size()==0){
+            intervals_array = make_interval_array(n);
+            individuals_array = make_first_generation(m,individual_value,intervals_array,array_start);
+            phenotype = make_phenotype(individuals_array,intervals_array,array_start);
+            reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
+        }
+        System.out.println();
+        System.out.println("Лучший кроссовер");
+        for (Individual individual : best_crossover) {
+            individual.print();
+        }
+        System.out.println();
+        System.out.println("Особи, мутация которых привела к улучшению фенотипа");
+        for (Individual individual : IndividualOfMutation) {
+            individual.print();
+        }
     }
 
     public static void initValue(){
@@ -86,6 +102,7 @@ public class lab7 {
                int t = 0;
                while (intervals_array.get(t)<individuals_array.get(x).value.get(y)) t++;
                interval_division[t-1] += array[y][t-1];
+               individuals_array.get(x).tasks.add(array[y][t-1]);
             }
             Arrays.sort(interval_division);
             individuals_array.get(x).phenotype = interval_division[interval_division.length-1];
@@ -157,19 +174,27 @@ public class lab7 {
         for(Individual q : pair_result) q.print();
     }
 
-    public static List<Individual> selection_sort(List<Integer> arr, List<Individual> array){
+
+
+    public static List<Individual> selection_sort(List<Integer> phenotypes, List<Individual> individuals){
         List<Individual> resArr = new ArrayList<>();
-        for (int i = 0; i < arr.size(); i++) {
+        for (int i = 0; i < phenotypes.size(); i++) {
             int min = i;
-            for (int j = 0; j < arr.size(); j = i+1) if (arr.get(j)>arr.get(min)) min = j;
-            int tempForArr = arr.get(min);
-            arr.set(min,arr.get(i)); arr.set(i, tempForArr);
-            Individual tempForArray = array.get(min);
-            array.set(min,array.get(i)); array.set(i, tempForArray);
+            for (int j = i+1; j < phenotypes.size(); j++){
+                if (phenotypes.get(j)>phenotypes.get(min)){
+                    min = j;
+                }
+            }
+            int tempForArr = phenotypes.get(min);
+            phenotypes.set(min,phenotypes.get(i));
+            phenotypes.set(i, tempForArr);
+            Individual tempForArray = individuals.get(min);
+            individuals.set(min,individuals.get(i));
+            individuals.set(i, tempForArray);
         }
-        int index = array.size()-1;
+        int index = individuals.size()-1;
         while (index>=0){
-            resArr.add(array.get(index));
+            resArr.add(individuals.get(index));
             index--;
         }
         return resArr;
@@ -192,11 +217,11 @@ public class lab7 {
             i.print();
         }
         List<Individual> array_sort = selection_sort(generation_phenotype,generation);
-        System.out.println("Реультат отбора");
+        counterPok++;
+        System.out.println("Результат отбора(Поколение " + counterPok+ "):");
         int size = individuals_array.size();
         individuals_array.clear();
         for (int i = 0; i < size; i++) individuals_array.add(array_sort.get(i));
-        System.out.println("Результат турнира(новое поколение):");
         for (Individual q : individuals_array){
             q.print();
         }
@@ -223,8 +248,8 @@ public class lab7 {
                 List<Integer> p2 = new ArrayList<>();
                 List<Individual> pair_result = new ArrayList<>();
                 List<Individual> pair_crossing = make_pair_crossing(individuals_array, pk);
-                int split_point = random.nextInt(i.value.size()-1);
-                int split_point2 = random.nextInt(i.value.size()-1);
+                int split_point = 1+random.nextInt(i.value.size()-1);
+                int split_point2 = 1 + random.nextInt(i.value.size()-1);
                 while (split_point==split_point2) split_point2 = (int) (Math.random()*((individuals_array.size()-1))-1);
                 System.out.println("Точка разбиения №1: " +  split_point);
                 System.out.println("Точка разбиения №2: " +  split_point2);
@@ -251,8 +276,26 @@ public class lab7 {
                 pair_result.add(new Individual(p2));
                 make_phenotype(pair_result, intervals_array, array_start);
                 for (Individual j : pair_result) j.print();
+                if (pair_result.get(0).phenotype<pair_crossing.get(0).phenotype && pair_result.get(0).phenotype<pair_crossing.get(1).phenotype &&
+                        pair_result.get(1).phenotype<pair_crossing.get(0).phenotype && pair_result.get(1).phenotype<pair_crossing.get(1).phenotype){
+                    best_crossover.add(pair_result.get(0));
+                    best_crossover.add(pair_result.get(1));
+                }else if(pair_result.get(0).phenotype<pair_crossing.get(0).phenotype && pair_result.get(0).phenotype<pair_crossing.get(1).phenotype){
+                    best_crossover.add(pair_result.get(0));
+                }else if (pair_result.get(1).phenotype<pair_crossing.get(0).phenotype && pair_result.get(1).phenotype<pair_crossing.get(1).phenotype){
+                    best_crossover.add(pair_result.get(1));
+                }
+                int[] phenotypesBeforeMutation = new int[pair_result.size()];
+                for (int j = 0; j < phenotypesBeforeMutation.length; j++) {
+                    phenotypesBeforeMutation[j] = pair_result.get(j).phenotype;
+                }
                 mutation(pair_result,intervals_array,array_start);
                 make_phenotype(pair_result, intervals_array, array_start);
+                for (int j = 0; j < phenotypesBeforeMutation.length; j++) {
+                    if (phenotypesBeforeMutation[j]>pair_result.get(j).phenotype){
+                        IndividualOfMutation.add(pair_result.get(j));
+                    }
+                }
                 if (pair_result.get(0).phenotype > pair_result.get(1).phenotype)best_new_individuals.add(pair_result.get(1));
                 else best_new_individuals.add(pair_result.get(0));
             }
@@ -280,13 +323,16 @@ public class lab7 {
         }
     }
     static class Individual{
+        List<Integer> tasks;
         List<Integer> value;
         int phenotype = -1;
         public Individual(List<Integer> value){
             this.value = value;
+            this.tasks = new ArrayList<>();
         }
-        public void print(){
-            System.out.println(this.value +" "+this.phenotype);
+        public void print() {
+            System.out.println(this.value + " " + this.phenotype);
+            System.out.println(tasks);
         }
     }
 }
