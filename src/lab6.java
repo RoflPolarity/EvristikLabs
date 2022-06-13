@@ -1,29 +1,33 @@
 import java.util.*;
 
 public class lab6 {
-    static List<Individual> best_crossover;
+    static List<Individual> best_crossover, phenotype, individuals_array, IndividualOfMutation;
     static int m,n,a,b,kpovtor,individual_value, counterPok;
     static double pk,pm;
     static int[] array_start;
     static List<Integer> intervals_array;
-    static List<Individual> individuals_array;
-    static List<Individual> phenotype;
 
     public static void main(String[] args) {
-    initValue();
-    best_crossover = new ArrayList<>();
-    while (best_crossover.size()==0){
-        intervals_array = make_interval_array(n);
-        individuals_array = make_first_generation(m,individual_value);
-        phenotype = make_phenotype(individuals_array,intervals_array,array_start);
-        reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
+        initValue();
+        best_crossover = new ArrayList<>();
+        IndividualOfMutation = new ArrayList<>();
+        while (best_crossover.size()==0){
+            intervals_array = make_interval_array(n);
+            individuals_array = make_first_generation(m,individual_value);
+            phenotype = make_phenotype(individuals_array,intervals_array,array_start);
+            reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
+        }
+        System.out.println();
+        System.out.println("Лучший кроссовер");
+        for (Individual individual : best_crossover) {
+            individual.print();
+        }
+        System.out.println();
+        System.out.println("Особи, мутация которых привела к улучшению фенотипа");
+        for (Individual individual : IndividualOfMutation) {
+            individual.print();
+        }
     }
-    System.out.println();
-    System.out.println("Лучший кроссовер");
-    for (Individual individual : best_crossover) {
-        individual.print();
-    }
-}
 
 public static void initValue(){
         Scanner scanner = new Scanner(System.in);
@@ -216,8 +220,17 @@ public static void initValue(){
                     }else if (pair_result.get(1).phenotype<pair_crossing.get(0).phenotype && pair_result.get(1).phenotype<pair_crossing.get(1).phenotype){
                         best_crossover.add(pair_result.get(1));
                     }
+                    int[] phenotypesBeforeMutation = new int[pair_result.size()];
+                    for (int j = 0; j < phenotypesBeforeMutation.length; j++) {
+                        phenotypesBeforeMutation[j] = pair_result.get(j).phenotype;
+                    }
                     mutation(pair_result);
                     make_phenotype(pair_result, intervals_array, array_start);
+                    for (int j = 0; j < phenotypesBeforeMutation.length; j++) {
+                        if (phenotypesBeforeMutation[j]>pair_result.get(j).phenotype){
+                            IndividualOfMutation.add(pair_result.get(j));
+                        }
+                    }
                     if (pair_result.get(0).phenotype > pair_result.get(1).phenotype)best_new_individuals.add(pair_result.get(1));
                     else best_new_individuals.add(pair_result.get(0));
                 }
