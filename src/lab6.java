@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class lab6 {
-    Individual best_crossover;
+    static List<Individual> best_crossover;
     static int m,n,a,b,kpovtor,individual_value, counterPok;
     static double pk,pm;
     static int[] array_start;
@@ -11,7 +11,18 @@ public class lab6 {
 
     public static void main(String[] args) {
     initValue();
-    reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
+    best_crossover = new ArrayList<>();
+    while (best_crossover.size()==0){
+        intervals_array = make_interval_array(n);
+        individuals_array = make_first_generation(m,individual_value);
+        phenotype = make_phenotype(individuals_array,intervals_array,array_start);
+        reproduction(individuals_array,pk,pm,intervals_array,kpovtor);
+    }
+    System.out.println();
+    System.out.println("Лучший кроссовер");
+    for (Individual individual : best_crossover) {
+        individual.print();
+    }
 }
 
 public static void initValue(){
@@ -37,9 +48,6 @@ public static void initValue(){
             array_start[i] = (int) (Math.random()*((b-a)+1)+a);
         }
         System.out.println(Arrays.toString(array_start));
-        intervals_array = make_interval_array(n);
-        individuals_array = make_first_generation(m,individual_value);
-        phenotype = make_phenotype(individuals_array,intervals_array,array_start);
     }
 
         public static List<Integer> make_interval_array(int n){
@@ -199,7 +207,15 @@ public static void initValue(){
                     pair_result.add(new Individual(p1));
                     pair_result.add(new Individual(p2));
                     make_phenotype(pair_result, intervals_array, array_start);
-                    List<Individual> pairRes = new ArrayList<>();
+                    if (pair_result.get(0).phenotype<pair_crossing.get(0).phenotype && pair_result.get(0).phenotype<pair_crossing.get(1).phenotype &&
+                            pair_result.get(1).phenotype<pair_crossing.get(0).phenotype && pair_result.get(1).phenotype<pair_crossing.get(1).phenotype){
+                        best_crossover.add(pair_result.get(0));
+                        best_crossover.add(pair_result.get(1));
+                    }else if(pair_result.get(0).phenotype<pair_crossing.get(0).phenotype && pair_result.get(0).phenotype<pair_crossing.get(1).phenotype){
+                        best_crossover.add(pair_result.get(0));
+                    }else if (pair_result.get(1).phenotype<pair_crossing.get(0).phenotype && pair_result.get(1).phenotype<pair_crossing.get(1).phenotype){
+                        best_crossover.add(pair_result.get(1));
+                    }
                     mutation(pair_result);
                     make_phenotype(pair_result, intervals_array, array_start);
                     if (pair_result.get(0).phenotype > pair_result.get(1).phenotype)best_new_individuals.add(pair_result.get(1));
