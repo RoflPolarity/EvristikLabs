@@ -125,16 +125,17 @@ public class lab7 {
         for (Individual individual : pair_result) {
             System.out.println("---------------------------");
             if (make_probability(pm)) {
-                int mutation_point = rand.nextInt(individuals_array.size());
+                int mutation_point = rand.nextInt(individuals_array.size()-1);
                 System.out.println("Элемент на замену: " + mutation_point);
-                int mutation_index = rand.nextInt(7);
-                System.out.println("Разряд для замены: " + mutation_index);
-                int mutation_index2 = rand.nextInt(7);
                 StringBuilder mutation_element = new StringBuilder(Integer.toBinaryString(individual.value.get(mutation_point)));
+                int mutation_index = rand.nextInt(mutation_element.length()-1);
+                System.out.println("Разряд для замены: " + mutation_index);
+                int mutation_index2 = rand.nextInt(mutation_element.length()-1);
                 while (mutation_index==mutation_index2) {
-                    mutation_index2 = rand.nextInt(7);
+                    mutation_index2 = rand.nextInt(mutation_element.length()-1);
                 }
-                    System.out.println("Разряд для замены2: " + mutation_index2);
+                System.out.println("Разряд для замены2: " + mutation_index2);
+
                 while (mutation_element.length()!=8){
                     mutation_element.insert(0, "0");
                     System.out.println("Элемент в двоичной системе исчисления до преобразований: " + mutation_element);
@@ -152,7 +153,7 @@ public class lab7 {
             }
         }
         System.out.println("Пара после мутации: ");
-        pair_result = make_phenotype(pair_result,intervals_array,array);
+        make_phenotype(pair_result, intervals_array, array);
         for(Individual q : pair_result) q.print();
     }
 
@@ -208,8 +209,6 @@ public class lab7 {
         Random random = new Random();
         while(true) {
             List<Individual> best_new_individuals = new ArrayList<>();
-            List<Integer> p1 = new ArrayList<>();
-            List<Integer> p2 = new ArrayList<>();
             if (best_individuals_in_generation.size() >= kpovtor) {
                 List<Integer> phenotypes = new ArrayList<>();
                 for(Individual t : best_individuals_in_generation) {
@@ -220,10 +219,12 @@ public class lab7 {
                 if (counter.getCount(index_dop) == kpovtor) break;
             }
             for(Individual i : individuals_array) {
+                List<Integer> p1 = new ArrayList<>();
+                List<Integer> p2 = new ArrayList<>();
                 List<Individual> pair_result = new ArrayList<>();
                 List<Individual> pair_crossing = make_pair_crossing(individuals_array, pk);
-                int split_point = random.nextInt((individuals_array.size()-1)+1)+1;
-                int split_point2 = random.nextInt((individuals_array.size()-1)+1)+1;
+                int split_point = random.nextInt(i.value.size()-1);
+                int split_point2 = random.nextInt(i.value.size()-1);
                 while (split_point==split_point2) split_point2 = (int) (Math.random()*((individuals_array.size()-1))-1);
                 System.out.println("Точка разбиения №1: " +  split_point);
                 System.out.println("Точка разбиения №2: " +  split_point2);
@@ -238,11 +239,11 @@ public class lab7 {
                 }else {
                     for (int j = 0; j < split_point2; j++) p1.add(pair_crossing.get(0).value.get(j));
                     for (int j = split_point2; j < split_point; j++) p1.add(pair_crossing.get(1).value.get(j));
-                    for (int j = split_point2; j < pair_crossing.get(0).value.size(); j++) p1.add(pair_crossing.get(0).value.get(j));
+                    for (int j = split_point; j < pair_crossing.get(0).value.size(); j++) p1.add(pair_crossing.get(0).value.get(j));
 
                     for (int j = 0; j < split_point2; j++) p2.add(pair_crossing.get(1).value.get(j));
                     for (int j = split_point2; j < split_point; j++) p2.add(pair_crossing.get(0).value.get(j));
-                    for (int j = split_point2; j < pair_crossing.get(1).value.size(); j++) p2.add(pair_crossing.get(1).value.get(j));
+                    for (int j = split_point; j < pair_crossing.get(1).value.size(); j++) p2.add(pair_crossing.get(1).value.get(j));
                 }
                 System.out.println(p1);
                 System.out.println(p2);
