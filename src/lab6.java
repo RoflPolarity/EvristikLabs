@@ -94,7 +94,7 @@ public static void initValue(){
                 }
 
                 interval_division[t - 1] += array[y];
-                individual.tasks.add(array[y]);
+                individual.addTask(array[y],array.length);
             }
             Arrays.sort(interval_division);
             individual.phenotype = interval_division[interval_division.length - 1];
@@ -270,6 +270,18 @@ static class Individual{
         public void print() {
             System.out.println(this.value + " " + this.phenotype);
             System.out.println(tasks);
+        }
+        private boolean getResize(int tasksSize){
+            return tasks.size()>tasksSize;
+        }
+        public void addTask(int task,int tasksSize){
+            tasks.add(task);
+            if (getResize(tasksSize)){
+                int size = tasks.size();
+                for (int i = 0; i < size/2; i++) {
+                    tasks.remove(i);
+                }
+            }
         }
     }
 }
